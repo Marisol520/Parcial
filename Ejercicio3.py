@@ -1,60 +1,65 @@
-class Cliente:
-    def __init__(self, nombre, apellido, edad, dias_estancia, habitacion, metodo_pago, direccion, telefono):
-        self.nombre = nombre
-        self.apellido = apellido
-        self.edad = edad
-        self.dias = dias_estancia 
-        self.habitacion = habitacion 
-        self.metodo_pago = metodo_pago
-        self.direccion = direccion
-        self.telefono = telefono
-        self.estado = "NO ATENDIDO"  
-        self.clasificacion = self.clasificar_cliente()
-#esta funcion es la que nos ayudara a saber la estancia del clinte si su estancia es menor a 5 dias
-# se utilizara la funcion del if,y al final del registro dira gracias por su estancia#
-# en caso de que el cliente desee quedarse mayor a 5 se utilizara la funcion que returna el else, 
-#  los dias el programa le dira que es poseedor de un decuento#
-    def clasificar_cliente(self):
-        if self.dias < 5:
-            return "gracias por su preferncia "
+productos = {}  # Debe ser inicializado antes de ser utilizado
+
+def agregar_producto_proveedor():
+    global productos  # Debe ser declarado como global para que se pueda acceder desde las funciones
+    while True:
+        nombre = input("Ingrese el nombre del producto: ")
+        precio_sugerido = float(input("Ingrese el precio sugerido de venta: "))
+        while True:
+            cantidad = int(input("Ingrese la cantidad de producto recibida: "))
+            if cantidad > 0:
+                break
+            else:
+                print("La cantidad debe ser mayor que cero")
+        productos[nombre] = {"precio_sugerido": precio_sugerido, "cantidad": cantidad}
+        respuesta = input("¿Desea agregar otro producto? (s/n): ")
+        if respuesta.lower() != 's':
+            break
+
+def vender_producto():
+    global productos  # Debe ser declarado como global para que se pueda acceder desde las funciones
+    total_venta = 0
+    while True:
+        nombre = input("Ingrese el nombre del producto que desea vender (o 'fin' para terminar): ")
+        if nombre.lower() == 'fin':
+            break
+        if nombre in productos:
+            while True:
+                cantidad_vender = int(input("Ingrese la cantidad que desea vender: "))
+                if cantidad_vender > 0:
+                    break
+                else:
+                    print("La cantidad debe ser mayor que cero")
+            if cantidad_vender <= productos[nombre]["cantidad"]:
+                precio_venta = float(input("Ingrese el precio de venta: "))
+                productos[nombre]["cantidad"] -= cantidad_vender
+                total_venta += precio_venta * cantidad_vender
+                print(f"Venta realizada: {nombre} x {cantidad_vender} = {precio_venta * cantidad_vender:.2f}")
+            else:
+                print("No hay suficiente stock para vender esa cantidad")
         else:
-            return "poseedor de descuento"
+            print("Producto no encontrado")
+    return total_venta
 
-    def atender_cliente(self):
-        self.estado = "ATENDIDO"
-#las lineas de codigo de los codigos siguientes sirven para mostrar la informacion del cliente al momento de registrarse al Hotel#
-    def mostrar_informacion(self):
-        print(f"Nombre: {self.nombre}")
-        print(f"Apellido: {self.apellido}")
-        print(f"Edad: {self.edad} años")
-        print(f"Días de estancia: {self.dias}")
-        print(f"Habitación: {self.habitacion}")
-        print(f"Método de pago: {self.metodo_pago}")
-        print(f"Dirección: {self.direccion}")
-        print(f"Teléfono: {self.telefono}")
-        print(f"Clasificación: {self.clasificacion}")
-        print(f"Estado: {self.estado}")
-#estas son etiquetas que apareceran al momento de aser el registro como por ejemplo la de Bienvenidos#
+def calcular_cambio(cliente_pago, total_venta):
+    if cliente_pago >= total_venta:
+        cambio = cliente_pago - total_venta
+        print(f"Cambio: {cambio:.2f}")
+    else:
+        print("No hay suficiente pago para realizar la venta")
+
+def mostrar_productos():
+    global productos  # Debe ser declarado como global para que se pueda acceder desde las funciones
+    print("Productos en la tienda:")
+    for nombre, producto in productos.items():
+        print(f"Nombre: {nombre}, Precio sugerido: {producto['precio_sugerido']}, Cantidad: {producto['cantidad']}")
+
 def main():
-    print("BIENVENIDO")
-    print("Registro de cliente")
-    print("Estado inicial del cliente: NO ATENDIDO")  
-
-    nombre = input("Nombre del cliente: ")
-    apellido = input("Apellido del cliente: ")
-    edad = int(input("Edad (en años): "))
-    dias_estancia = int(input("Días de estancia (en días): "))
-    habitacion = input("Tamaño de habitación: ")
-    metodo_pago = input("Método de pago: ")
-    direccion = input("Dirección del cliente: ")
-    telefono = input("Teléfono del cliente: ")
-
-    nuevo_cliente = Cliente(nombre, apellido, edad, dias_estancia, habitacion, metodo_pago, direccion, telefono)
-
-    nuevo_cliente.atender_cliente()
-
-    print(f"\nEstado final: {nuevo_cliente.estado}")
-    nuevo_cliente.mostrar_informacion()
+    agregar_producto_proveedor()
+    mostrar_productos()
+    total_venta = vender_producto()
+    cliente_pago = float(input("Ingrese el pago del cliente: "))
+    calcular_cambio(cliente_pago, total_venta)
 
 if __name__ == "__main__":
     main()
